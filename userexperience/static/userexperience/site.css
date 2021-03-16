@@ -25,3 +25,8 @@
     padding: 5px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+.textarea {
+    overflow-y: scroll;
+    height: 100px;
+    resize: none;
+}
