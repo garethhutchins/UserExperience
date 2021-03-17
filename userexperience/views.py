@@ -5,7 +5,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.utils.timezone import datetime
 from django.core.files.storage import FileSystemStorage
-
+from django.conf import settings as conf_settings
+from django.apps import apps
 # Create your views here.
 def home(request):
     return render(request, "userexperience/home.html")
@@ -46,14 +47,15 @@ def train(request):
     return render(request, "userexperience/train.html")
 def settings(request):
     #Save the settings
-    print(getattr(app_settings, 'TIKA', 'default value'))
     if request.method == 'POST':
+        print(conf_settings.TIKA)
         #settings.TIKA = 'Test'
-        print(getattr(app_settings, 'TIKA', 'default value'))
+        conf_settings.TIKA = "http://localhost:9998/tika"
     return render(request, "userexperience/settings.html")
 def about(request):
     return render(request, "userexperience/about.html")
 def contact(request):
     return render(request,"userexperience/contact.html")
+
 print('starting web app')
 print('http://127.0.0.1:8000/userexperience/VSCode')
