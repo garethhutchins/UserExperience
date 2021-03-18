@@ -1,6 +1,7 @@
 import re
 import requests
 import mimetypes
+import pandas as pd
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.utils.timezone import datetime
@@ -22,36 +23,53 @@ def test(request):
     return render(request, "userexperience/test.html")
 def train(request):
     #Check to see if a file has been selected
+    #Look to see what needs to be treaded as csv
+    csv_types = ["application/vnd.ms-excel","application/csv","text/csv"]
     if request.method == 'POST' and request.FILES['myfile']:
         myfile = request.FILES['myfile']
         #Save the file so it can be read
         fs = FileSystemStorage()
         filename = fs.save(myfile.name, myfile)
         full_file_path = fs.location + "/" + filename
-        #Set the tika request url
-        url = "http://localhost:9998/tika"
-        #open the file for reading
-        with open(full_file_path, 'rb') as f:
-            payload=f.read()
-        #Guess the Mime Type and set the content type for the tika request
+        #Guess the Mime Type
         mime = mimetypes.guess_type(full_file_path)
-        headers = {
-                'Content-Type': mime[0]
-                }
-        response = requests.request("PUT", url, headers=headers, data=payload)
-        #Now delete the file
-        fs.delete(filename)
-        #Now send the text results back to the testing page
-        args = {'result' : response.text }
+        csv = request.POST.get('csv')
+        if mime[0] in csv_types and csv == 'on':
+            print('csv')
+            #Read the file in Pandas
+            df = pd.read_csv(full_file_path,index_col=0)
+            #Now delete the file
+            fs.delete(filename)
+            df_text = df.to_string(max_rows=5,justify='left',max_colwidth=200)
+            #Set the result to be the dataframe as a string
+            args = {'result' : df_text}
+        else:
+            #Put the document through tika
+            #Set the tika request url
+            url = conf_settings.TIKA
+            #open the file for reading
+            with open(full_file_path, 'rb') as f:
+                payload=f.read()
+            #Add the header
+            headers = {
+                    'Content-Type': mime[0]
+                    }
+            response = requests.request("PUT", url, headers=headers, data=payload)
+            #Now delete the file
+            fs.delete(filename)
+            #Now send the text results back to the testing page
+            args = {'result' : response.text }
         return render(request, 'userexperience/train.html', args)
     return render(request, "userexperience/train.html")
 def settings(request):
+    #Get the settings from the file
     #Save the settings
     if request.method == 'POST':
-        print(conf_settings.TIKA)
-        #settings.TIKA = 'Test'
-        conf_settings.TIKA = "http://localhost:9998/tika"
-    return render(request, "userexperience/settings.html")
+        #Get the form data
+        tika_url = request.POST.get('tika_url')
+        conf_settings.TIKA = tika_url
+    args = {'tika_url' : conf_settings.TIKA}
+    return render(request, "userexperience/settings.html",args)
 def about(request):
     return render(request, "userexperience/about.html")
 def contact(request):
