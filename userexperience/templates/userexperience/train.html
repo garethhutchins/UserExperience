@@ -8,28 +8,69 @@ Train
 <p>Enter Text or Select File</p>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-  <input type="checkbox" id="csv" name="csv" onclick="csv_clicked()">
-  <label for="csv"> Treat CSVs files as Tables </label><br>
-  <input type="file" name="myfile">
-  <button type="submit">Upload</button>
+  
+  {% if text %}
+    <input type="checkbox" id="csv" name="csv" onclick="csv_clicked()">
+    <label for="csv"> Treat CSVs files as Tables </label><br>
+    <div id="dataframe" style="display: none">
+      <label for="column">Select Text Column Number (Starting at 0)</label>
+      <input type="text" id="column" name="column" value="{{ column }}">
+      </br>
+    </div>
+  {% else %}
+    <input type="checkbox" id="csv" name="csv" onclick="csv_clicked()" checked>
+    <label for="csv"> Treat CSVs files as Tables </label><br>
+    <div id="dataframe">
+      <label for="column">Select Text Column Number (Starting at 0)</label>
+      <input type="text" id="column" name="column" value="{{ column }}">
+      </br>
+    </div>
+  {% endif %}
+  <input type="file" name="myfile" id="myfile" onchange="getfile_changed()">
+  <button type="submit" id="file_upload" name="file_upload" disabled>Get Text</button>
 </form>
 {% if uploaded_file_url %}
   <p>File uploaded at: <a href="{{ uploaded_file_url }}">{{ uploaded_file_url }}</a></p>
 {% endif %}
 </br>
+
+
+{% if text %}
 <div id="text">
   <p>Text To Test</p>
   <textarea rows="20" cols="100">{{ result }} </textarea>
 </div>
+
+{% else %}
+  <div id="text" style="display: none">
+    <p>Text To Test</p>
+    <textarea rows="20" cols="100">{{ result }} </textarea>
+  </div>
+  <div id="showtable">
+    {{ html_result|safe }}
+  </div>
+{% endif %}
+
 <script type = "text/javascript">
+function getfile_changed(){
+  var btn_GetText = document.getElementById("file_upload");
+  btn_GetText.disabled = false;
+}
+
 function csv_clicked() {
   var csv = document.getElementById("csv");
   var text = document.getElementById("text");
+  var dataframe = document.getElementById("dataframe")
+  var showtable = document.getElementById("showtable")
   if (csv.checked) {
     text.style.display = "none";
+    dataframe.style.display = "initial";
+    showtable.style.display = "initial";
   }
   else {
     text.style.display = "initial";
+    dataframe.style.display = "none";
+    showtable.style.display = "none";
   }
 }
 </script>

@@ -25,7 +25,7 @@ def train(request):
     #Check to see if a file has been selected
     #Look to see what needs to be treaded as csv
     csv_types = ["application/vnd.ms-excel","application/csv","text/csv"]
-    if request.method == 'POST' and request.FILES['myfile']:
+    if request.method == 'POST' and "file_upload" in request.POST:
         myfile = request.FILES['myfile']
         #Save the file so it can be read
         fs = FileSystemStorage()
@@ -40,9 +40,18 @@ def train(request):
             df = pd.read_csv(full_file_path,index_col=0)
             #Now delete the file
             fs.delete(filename)
-            df_text = df.to_string(max_rows=5,justify='left',max_colwidth=200)
-            #Set the result to be the dataframe as a string
-            args = {'result' : df_text}
+            #Now check to see if there was a value in the selected column
+            col_selected = request.POST.get('column')
+            if (col_selected != ""):
+                df = df[df.columns[int(col_selected)-1]]
+                df = pd.DataFrame(df)
+                df_html = df.to_html(index=False)
+                #Set the result to be the dataframe as a string
+                args = {'html_result' : df_html, 'text' : False, 'column': col_selected}
+            else:
+                df_html = df.to_html()
+                #Set the result to be the dataframe as a string
+                args = {'html_result' : df_html, 'text' : False}
         else:
             #Put the document through tika
             #Set the tika request url
@@ -58,9 +67,10 @@ def train(request):
             #Now delete the file
             fs.delete(filename)
             #Now send the text results back to the testing page
-            args = {'result' : response.text }
+            args = {'result' : response.text, 'text' : True }
         return render(request, 'userexperience/train.html', args)
-    return render(request, "userexperience/train.html")
+    args = {'text' : True}
+    return render(request, "userexperience/train.html",args)
 def settings(request):
     #Get the settings from the file
     #Save the settings
