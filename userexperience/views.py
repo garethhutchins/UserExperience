@@ -2,6 +2,7 @@ import re
 import requests
 import mimetypes
 import pandas as pd
+import json
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.utils.timezone import datetime
@@ -40,18 +41,13 @@ def train(request):
             df = pd.read_csv(full_file_path,index_col=0)
             #Now delete the file
             fs.delete(filename)
-            #Now check to see if there was a value in the selected column
-            col_selected = request.POST.get('column')
-            if (col_selected != ""):
-                df = df[df.columns[int(col_selected)-1]]
-                df = pd.DataFrame(df)
-                df_html = df.to_html(index=False)
-                #Set the result to be the dataframe as a string
-                args = {'html_result' : df_html, 'text' : False, 'column': col_selected}
-            else:
-                df_html = df.to_html()
-                #Set the result to be the dataframe as a string
-                args = {'html_result' : df_html, 'text' : False}
+            #Set the result to be the dataframe as a string
+            index_name = df.index.name
+            column_names = df.columns
+            json_records = df.reset_index().to_json(orient='records')
+            data = []
+            data = json.loads(json_records)
+            args = {'text' : False, 'table_data' : data, 'column_names' : column_names, 'index_name' : index_name}
         else:
             #Put the document through tika
             #Set the tika request url

@@ -12,19 +12,11 @@ Train
   {% if text %}
     <input type="checkbox" id="csv" name="csv" onclick="csv_clicked()">
     <label for="csv"> Treat CSVs files as Tables </label><br>
-    <div id="dataframe" style="display: none">
-      <label for="column">Select Text Column Number (Starting at 0)</label>
-      <input type="text" id="column" name="column" value="{{ column }}">
-      </br>
-    </div>
+    
   {% else %}
     <input type="checkbox" id="csv" name="csv" onclick="csv_clicked()" checked>
     <label for="csv"> Treat CSVs files as Tables </label><br>
-    <div id="dataframe">
-      <label for="column">Select Text Column Number (Starting at 0)</label>
-      <input type="text" id="column" name="column" value="{{ column }}">
-      </br>
-    </div>
+    
   {% endif %}
   <input type="file" name="myfile" id="myfile" onchange="getfile_changed()">
   <button type="submit" id="file_upload" name="file_upload" disabled>Get Text</button>
@@ -47,7 +39,34 @@ Train
     <textarea rows="20" cols="100">{{ result }} </textarea>
   </div>
   <div id="showtable">
-    {{ html_result|safe }}
+    {% if table_data %}
+      <h2 class="text-center"><u>Table Results</u></h2><br> 
+      <table>
+        <thead>
+          <tr>
+            <td>
+              <input type="checkbox" name="column" onclick="column_clicked(this)">
+              <label for="index"> {{index_name}} </label><br>
+            </td>
+            {% for c in column_names %}
+              <td>
+                <input type="checkbox" name="column" onclick="column_clicked(this)">
+                <label for="index"> {{ c }} </label><br>
+              </td>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for td in table_data %}
+            <tr>
+              {% for key, value in td.items %}
+                <td><textarea rows=3 cols="100" name="{{key}}[]">{{ value }}</textarea></td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
   </div>
 {% endif %}
 
@@ -56,20 +75,24 @@ function getfile_changed(){
   var btn_GetText = document.getElementById("file_upload");
   btn_GetText.disabled = false;
 }
+function column_clicked(col){
+  var myCheckbox = document.getElementsByName("column");
+  Array.prototype.forEach.call(myCheckbox,function(el){
+    el.checked = false;
+  });
+  col.checked = true;
+}
 
 function csv_clicked() {
   var csv = document.getElementById("csv");
   var text = document.getElementById("text");
-  var dataframe = document.getElementById("dataframe")
   var showtable = document.getElementById("showtable")
   if (csv.checked) {
     text.style.display = "none";
-    dataframe.style.display = "initial";
     showtable.style.display = "initial";
   }
   else {
     text.style.display = "initial";
-    dataframe.style.display = "none";
     showtable.style.display = "none";
   }
 }
