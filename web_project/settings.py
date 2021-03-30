@@ -27,8 +27,8 @@ SECRET_KEY = '$v_k&312mor5ul#9+(h5_*zgig84u*%4%eaqw*u)lhb9k-@6#)'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-
+#Disable the maximum number of fields for the tables
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 # Application definition
 
 INSTALLED_APPS = [

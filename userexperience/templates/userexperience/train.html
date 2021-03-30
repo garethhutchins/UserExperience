@@ -39,34 +39,48 @@ Train
     <textarea rows="20" cols="100">{{ result }} </textarea>
   </div>
   <div id="showtable">
-    {% if table_data %}
-      <h2 class="text-center"><u>Table Results</u></h2><br> 
-      <table>
-        <thead>
-          <tr>
-            <td>
-              <input type="checkbox" name="column" onclick="column_clicked(this)">
-              <label for="index"> {{index_name}} </label><br>
-            </td>
-            {% for c in column_names %}
-              <td>
-                <input type="checkbox" name="column" onclick="column_clicked(this)">
-                <label for="index"> {{ c }} </label><br>
-              </td>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for td in table_data %}
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      {% if table_data %}
+        <h2 class="text-center"><u>Table Results</u></h2><br> 
+        {% if first_view %}
+          <p>Select a Column to Use</p>
+        {% endif %}
+        <button type="submit" id="table_submit" name="table_submit" disabled>Clean Text</button>
+        <input type="hidden" id="selected_column" name="selected_column">
+        <table>
+          <thead>
             <tr>
-              {% for key, value in td.items %}
-                <td><textarea rows=3 cols="100" name="{{key}}[]">{{ value }}</textarea></td>
-              {% endfor %}
+              {% if first_view %}
+                <td>
+                  <input type="checkbox" name="column_check" id="{{ index_name }}" onclick="column_clicked(this)">
+                  <label for="index"> {{index_name}} </label><br>
+                </td>
+                {% for c in column_names %}
+                  <td>
+                    <input type="checkbox" name="column_check" id="{{ c }}" onclick="column_clicked(this)">
+                    <label for="index"> {{ c }} </label><br>
+                  </td>
+                {% endfor %}
+              {% endif %}
+              {% if cleaned %}
+                  <td>{{index_name}}</td>
+              {% endif %}
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% endif %}
+          </thead>
+          <tbody>
+            {% for td in table_data %}
+              <tr>
+                {% for key, value in td.items %}
+                <td><textarea rows=3 cols="100" name="{{key}}_[{{forloop.parentloop.counter}}]">{{ value }}</textarea></td>
+                {% endfor %}
+              </tr>
+            {% endfor %}          
+          </tbody>
+        </table>
+      {% endif %}
+    </form>
   </div>
 {% endif %}
 
@@ -76,11 +90,15 @@ function getfile_changed(){
   btn_GetText.disabled = false;
 }
 function column_clicked(col){
-  var myCheckbox = document.getElementsByName("column");
+  var myCheckbox = document.getElementsByName("column_check");
+  var selected_column = document.getElementById("selected_column");
+  var table_submit = document.getElementById("table_submit");
   Array.prototype.forEach.call(myCheckbox,function(el){
     el.checked = false;
   });
   col.checked = true;
+  selected_column.value = col.getAttribute("id");
+  table_submit.disabled = false;
 }
 
 function csv_clicked() {

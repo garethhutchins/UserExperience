@@ -47,7 +47,7 @@ def train(request):
             json_records = df.reset_index().to_json(orient='records')
             data = []
             data = json.loads(json_records)
-            args = {'text' : False, 'table_data' : data, 'column_names' : column_names, 'index_name' : index_name}
+            args = {'text' : False, 'table_data' : data, 'column_names' : column_names, 'index_name' : index_name, 'first_view' : True}
         else:
             #Put the document through tika
             #Set the tika request url
@@ -64,6 +64,23 @@ def train(request):
             fs.delete(filename)
             #Now send the text results back to the testing page
             args = {'result' : response.text, 'text' : True }
+        return render(request, 'userexperience/train.html', args)
+    if request.method == "POST" and "table_submit" in request.POST:
+        #This is now sending the table to be cleaned
+        selected_column = request.POST.get('selected_column')
+        #Now loop through all of the elemets to convert them into arrays
+        list_vals = []
+        for key, value in request.POST.items():
+            #Look to see if the column is a mathc
+            if re.search(selected_column,key):
+                #Add the value to a list
+                list_vals.append(value)
+        df = pd.DataFrame(list_vals)
+        json_records = df.to_json(orient='records')
+        data = []
+        data = json.loads(json_records)
+        #Now send the results back to the page
+        args = {'text' : False, 'table_data' : data, 'index_name' : selected_column, 'cleaned' : True}
         return render(request, 'userexperience/train.html', args)
     args = {'text' : True}
     return render(request, "userexperience/train.html",args)
