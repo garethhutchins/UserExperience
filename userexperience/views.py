@@ -9,6 +9,7 @@ from django.utils.timezone import datetime
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings as conf_settings
 from django.apps import apps
+from flatten_json import flatten
 # Create your views here.
 def home(request):
     return render(request, "userexperience/home.html")
@@ -34,6 +35,18 @@ def train(request):
         full_file_path = fs.location + "/" + filename
         #Guess the Mime Type
         mime = mimetypes.guess_type(full_file_path)
+        #Start with Json Objects
+        if mime[0] == "application/json":
+            #We're now going to dump the json object
+            with open(full_file_path, 'r') as j:
+                contents = json.loads(j.read())
+            #Now let's flatten it so it's easier to render
+            contents = flatten(contents)
+            #Delete the json file
+            fs.delete(filename)
+            #Now send this back to the page so the user can select the keys to send to the following phases
+            args = {'text' : False, 'json_data' : contents, 'first_view' : True}
+            return render(request, "userexperience/train.html", args)
         csv = request.POST.get('csv')
         if mime[0] in csv_types and csv == 'on':
             print('csv')
@@ -62,8 +75,11 @@ def train(request):
             response = requests.request("PUT", url, headers=headers, data=payload)
             #Now delete the file
             fs.delete(filename)
+            return_text = response.text
+            if response.status_code != 200:
+                return_text = response.reason
             #Now send the text results back to the testing page
-            args = {'result' : response.text, 'text' : True }
+            args = {'result' : return_text, 'text' : True }
         return render(request, 'userexperience/train.html', args)
     if request.method == "POST" and "table_submit" in request.POST:
         #This is now sending the table to be cleaned

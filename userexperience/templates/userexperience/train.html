@@ -32,7 +32,27 @@ Train
   <p>Text To Test</p>
   <textarea rows="20" cols="100">{{ result }} </textarea>
 </div>
-
+{% elif json_data %}
+  <div id="json">
+    <p>Select JSON Attributes to Use</p>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <table>
+        {% for key, value in json_data.items %}
+        <tr>
+          <td>
+            <input type="checkbox" id="{{ key }}" name="json_key" onclick="json_clicked(this)">
+            <label for="{{ key }}">{{ key }}</label>
+          </td>
+          <td>
+            <td><textarea rows=3 cols="100" name="{{key}}">{{ value }}</textarea></td>
+          </td>
+        </tr>
+        
+        {% endfor %}
+      </table>
+    </form> 
+  </div>
 {% else %}
   <div id="text" style="display: none">
     <p>Text To Test</p>
@@ -113,6 +133,25 @@ function csv_clicked() {
     text.style.display = "initial";
     showtable.style.display = "none";
   }
+}
+function json_clicked(att){
+  let rowname = att.getAttribute("id");
+  let reg = /_\d+_/g;
+  let matchrow = rowname.replace(reg,"_\\d+_")
+  var json_key = document.getElementsByName("json_key");
+  const regex = new RegExp(matchrow)
+  Array.prototype.forEach.call(json_key,function(ea){
+    var rowname = ea.getAttribute("id");
+    if (regex.test(rowname)) {
+      if (att.checked) {
+        ea.checked = true;
+      }
+      else {
+        ea.checked = false;
+      }
+      
+    }
+  })
 }
 </script>
 
