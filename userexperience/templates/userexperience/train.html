@@ -38,6 +38,12 @@ Train
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <table>
+        <thead>
+          <th id="jsonheaders">
+            <td>Attributes</td>
+            <td>Values</td>
+          </th>
+        </thead>
         {% for key, value in json_data.items %}
         <tr>
           <td>
@@ -70,7 +76,7 @@ Train
         <button type="submit" id="table_submit" name="table_submit" disabled>Clean Text</button>
         <input type="hidden" id="selected_column" name="selected_column">
         <table>
-          <thead>
+          <th id="csvheader">
             <tr>
               {% if first_view %}
                 <td>
@@ -88,7 +94,7 @@ Train
                   <td>{{index_name}}</td>
               {% endif %}
             </tr>
-          </thead>
+          </th>
           <tbody>
             {% for td in table_data %}
               <tr>
