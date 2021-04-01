@@ -38,12 +38,12 @@ Train
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <table>
-        <thead>
-          <th id="jsonheaders">
-            <td>Attributes</td>
-            <td>Values</td>
-          </th>
-        </thead>
+        
+        <tr>
+          <th id="json_header_attribute">Attributes</th>
+          <th id="json_header_value">Values</th>
+        </tr>
+        
         {% for key, value in json_data.items %}
         <tr>
           <td>
@@ -51,7 +51,7 @@ Train
             <label for="{{ key }}">{{ key }}</label>
           </td>
           <td>
-            <td><textarea rows=3 cols="100" name="{{key}}">{{ value }}</textarea></td>
+            <textarea rows=3 cols="100" name="{{key}}">{{ value }}</textarea>
           </td>
         </tr>
         
@@ -69,7 +69,7 @@ Train
       {% csrf_token %}
       
       {% if table_data %}
-        <h2 class="text-center"><u>Table Results</u></h2><br> 
+        <h2 class="text-center"><u>Table Results</u></h2><br>
         {% if first_view %}
           <p>Select a Column to Use</p>
         {% endif %}

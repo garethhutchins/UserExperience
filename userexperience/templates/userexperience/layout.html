@@ -5,6 +5,11 @@
         <title>{% block title %}{% endblock%}</title>
         {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static 'userexperience/site.css' %}"/>
+        <style>
+            table, th, td {
+              border: 1px solid black;
+            }
+            </style>
     </head>
     <body>
         <div class="navbar">
