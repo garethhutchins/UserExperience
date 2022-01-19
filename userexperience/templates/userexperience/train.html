@@ -3,14 +3,14 @@
 Train
 {% endblock %}
 {% block content %}
-<p>Training page for Narrative Flow Analysis.</p>
+<h1>Training page for Narrative Flow Analysis</h1>
 </br>
-<p>Select CSV File for Training</p>
+<strong>Select CSV File for Training</strong>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
   
   <input type="file" name="myfile" id="myfile" onchange="getfile_changed()">
-  <button type="submit" id="file_upload" name="file_upload" disabled>Get Text</button>
+  <button type="submit" id="file_upload" name="file_upload" disabled>Read CSV</button>
 </form>
 {% if uploaded_file_url %}
   <p>File uploaded at: <a href="{{ uploaded_file_url }}">{{ uploaded_file_url }}</a></p>
@@ -22,42 +22,75 @@ Train
   <textarea rows="20" cols="100">{{ result }} </textarea>
 </div>
 <div id="showtable">
-  <form method="post" enctype="multipart/form-data">
+  <method="post" enctype="multipart/form-data">
     {% csrf_token %}
     
     {% if table_data %}
-      <h2 class="text-center"><u>Table Results</u></h2><br>
+      <h2 class="text-center" onclick="text_selected()">Configure Model</h2><br>
+      <strong>Step 1 - Chose the Column that contains the text</strong><br>
       {% if first_view %}
-        <p>Select Model to Use</p>
-        <p>Select Column Which Contains the Text</p>
+        <label for="text_column">Text Column</label>
+        <select id="text_column" name="training_param" onchange="text_selected()">
+          <option hidden disabled selected value> -- select an option -- </option>
+          {% for c in column_names %}
+            <option value="{{ c }}">{{ c }}</option>
+          {% endfor %}
+        </select>
+        <br><strong>Step 2 - Chose the Model to Use</strong><br>
+        
+        <label for="model_selection">Model</label>
+        <select id="model_selection" disabled onchange="model_selected()">
+          <option hidden disabled selected value> -- select an option -- </option>
+          <option value="K-MEANS">K-MEANS</option>
+          <option value="LDA">LDA</option>
+          <option value="NMF">NMF</option>
+          <option value="TF-IDF">TF-IDF</option>
+        </select>
+        <br><strong>Step 3 - Chose Text Normalisation (Optional - Not for K-Means Models)</strong><br>
+        
+        <label for="normalisation">Text Normalisation</label>
+        <select id="normalisation" disabled>
+          <option hidden disabled selected value> -- select an option -- </option>
+          <option value="None">None</option>
+          <option value="Lemmatization">Lemmatization</option>
+          <option value="Stemming">Stemming</option>
+        </select>
+        <br><strong>Step 4 - Chose The Label Column for TF-IDF Models</strong><br>
+        <label for="label_column">Label Column</label>
+        <select id="label_column" name="training_param" disabled onchange="label_changed()">
+          <option hidden disabled selected value> -- select an option -- </option>
+          {% for c in column_names %}
+            <option value="{{ c }}">{{ c }}</option>
+          {% endfor %}
+        </select>
+        <br><strong>Step 5 - Chose the Number of Topics >1 for NMF, Optional for LDA 0 will estimate the number</strong><br>
+        <label for="num_topics">Number of Topics:</label>
+        <input type="number" id="num_topics" name="num_topics" min="0" disabled><br> 
+        
       {% endif %}
-      <button type="submit" id="table_submit" name="table_submit" disabled>Clean Text</button>
-      <input type="hidden" id="selected_column" name="selected_column">
-      <table>
-        <th id="csvheader">
-          <tr>
-            {% if first_view %}
-              <td>
-                <input type="checkbox" name="column_check" id="{{ index_name }}" onclick="column_clicked(this)">
-                <label for="index"> {{index_name}} </label><br>
-              </td>
-              {% for c in column_names %}
-                <td>
-                  <input type="checkbox" name="column_check" id="{{ c }}" onclick="column_clicked(this)">
-                  <label for="index"> {{ c }} </label><br>
-                </td>
-              {% endfor %}
-            {% endif %}
-            {% if cleaned %}
-                <td>{{index_name}}</td>
-            {% endif %}
-          </tr>
-        </th>
+      <br><button type="submit" id="table_submit" name="table_submit" disabled>Train Model</button><br>
+      <br><table width="100%">
+        
+        <tr>
+          {% if first_view %}
+            
+            <th id="{{index_name}}"><span style="max-width:150px;"> {{index_name}}</span></th>
+           
+            {% for c in column_names %}
+              <th id="{{ c }}"><span style="max-width:150px;"> {{c}} </span></th>
+              
+            {% endfor %}
+          {% endif %}
+          {% if cleaned %}
+              <td>{{index_name}}</td>
+          {% endif %}
+        </tr>
+        
         <tbody>
           {% for td in table_data %}
             <tr>
               {% for key, value in td.items %}
-              <td><textarea rows=3 cols="100" name="{{key}}_[{{forloop.parentloop.counter}}]">{{ value }}</textarea></td>
+              <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ value }}</span></td>
               {% endfor %}
             </tr>
           {% endfor %}          
@@ -72,31 +105,62 @@ function getfile_changed(){
   var btn_GetText = document.getElementById("file_upload");
   btn_GetText.disabled = false;
 }
-function column_clicked(col){
-  var myCheckbox = document.getElementsByName("column_check");
-  var selected_column = document.getElementById("selected_column");
+function text_selected(){
+  var model_selection = document.getElementById("model_selection");
+  model_selection.disabled = false;
+}
+function model_selected(){
+  var model_selection = document.getElementById("model_selection");
+  var normalisation = document.getElementById("normalisation")
+  var label_column = document.getElementById("label_column");
   var table_submit = document.getElementById("table_submit");
-  Array.prototype.forEach.call(myCheckbox,function(el){
-    el.checked = false;
-  });
-  col.checked = true;
-  selected_column.value = col.getAttribute("id");
+  var num_topics = document.getElementById("num_topics");
+  
+  if (model_selection.value != "K-MEANS") {
+    normalisation.disabled = false;
+    if (normalisation.value != "") {
+      table_submit.disabled = false;
+    }
+  }
+  else {
+    num_topics.disabled = true;
+    num_topics.value = "";
+    normalisation.disabled = true;
+    normalisation.value = "";
+    table_submit.disabled = false;
+  }
+  if (model_selection.value == "TF-IDF"){
+    label_column.disabled = false;
+    num_topics.disabled = true;
+    num_topics.value = "";
+    if (label_column.value == ""){
+      table_submit.disabled = true;
+    }
+    else{
+      table_submit.disabled=false;
+      label_column.value = "";
+    }
+  }
+  else {
+    label_column.disabled = true;
+    label_column.value = "";
+  }
+  if (model_selection.value == "LDA"){
+    num_topics.value = "0";
+    num_topics.disabled = false;
+  }
+  if (model_selection.value == "NMF"){
+    num_topics.value = "2";
+    num_topics.disabled = false;
+  }
+}
+function label_changed(){
+  var label_column = document.getElementById("label_column");
   table_submit.disabled = false;
 }
 
-function csv_clicked() {
-  var csv = document.getElementById("csv");
-  var text = document.getElementById("text");
-  var showtable = document.getElementById("showtable")
-  if (csv.checked) {
-    text.style.display = "none";
-    showtable.style.display = "initial";
-  }
-  else {
-    text.style.display = "initial";
-    showtable.style.display = "none";
-  }
-}
+
+
 </script>
 
 <p><a href="{% url 'home' %}">Return to home</a></p>
