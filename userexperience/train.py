@@ -2,6 +2,7 @@ from django.core.files.storage import FileSystemStorage
 import mimetypes
 import pandas as pd
 import json
+import re
 
 def load_csv(myfile):
     #Look to see what needs to be treaded as csv
@@ -43,3 +44,5 @@ def table_submit(request):
     #Now send the results back to the page
     args = {'text' : False, 'table_data' : data, 'index_name' : selected_column, 'cleaned' : True}
     return args
+def model_train(request):
+    return

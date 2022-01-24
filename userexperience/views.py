@@ -10,7 +10,7 @@ from django.utils.timezone import datetime
 from django.conf import settings as conf_settings
 from django.apps import apps
 from flatten_json import flatten
-from .train import load_csv, table_submit
+from .train import load_csv, table_submit, model_train
 # Create your views here.
 def home(request):
     return render(request, "userexperience/home.html")
@@ -23,12 +23,10 @@ def train(request):
         myfile = request.FILES['myfile']
         args = load_csv(myfile)
         return render(request, 'userexperience/train.html', args)
-    #See if the post is from the user selecting the correct columns from a previously uploaded file
-    if request.method == "POST" and "table_submit" in request.POST:
-        #This is now sending the table to be cleaned
-        args = table_submit(request)
-        return render(request, 'userexperience/train.html', args)
-    args = {'text' : True}
+    #See if the post is from the model parameter screen
+    if request.method == "POST" and "model_selection" in request.POST:
+        args = model_train(request)
+    args = {'first' : True}
     return render(request, "userexperience/train.html",args)
 def settings(request):
     #Get the settings from the file

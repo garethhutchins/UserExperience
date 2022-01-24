@@ -5,13 +5,16 @@ Train
 {% block content %}
 <h1>Training page for Narrative Flow Analysis</h1>
 </br>
-<strong>Select CSV File for Training</strong>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-  
-  <input type="file" name="myfile" id="myfile" onchange="getfile_changed()">
-  <button type="submit" id="file_upload" name="file_upload" disabled>Read CSV</button>
-</form>
+{% if first %}
+  <strong>Select CSV File for Training</strong>
+  <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+    
+    <input type="file" name="myfile" id="myfile" onchange="getfile_changed()">
+    <button type="submit" id="file_upload" name="file_upload" disabled>Preview CSV</button>
+  </form>
+{% endif %}
+
 {% if uploaded_file_url %}
   <p>File uploaded at: <a href="{{ uploaded_file_url }}">{{ uploaded_file_url }}</a></p>
 {% endif %}
@@ -22,62 +25,69 @@ Train
   <textarea rows="20" cols="100">{{ result }} </textarea>
 </div>
 <div id="showtable">
-  <method="post" enctype="multipart/form-data">
+  
     {% csrf_token %}
     
     {% if table_data %}
-      <h2 class="text-center" onclick="text_selected()">Configure Model</h2><br>
-      <strong>Step 1 - Chose the Column that contains the text</strong><br>
-      {% if first_view %}
-        <label for="text_column">Text Column</label>
-        <select id="text_column" name="training_param" onchange="text_selected()">
-          <option hidden disabled selected value> -- select an option -- </option>
-          {% for c in column_names %}
-            <option value="{{ c }}">{{ c }}</option>
-          {% endfor %}
-        </select>
-        <br><strong>Step 2 - Chose the Model to Use</strong><br>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h2 class="text-center" onclick="text_selected()">Configure Model</h2><br>
+        <strong>Step 1 - Choose the training file</strong><br>
+        <input type="file" name="myfile" id="myfile" onchange="getfile_model_changed()">
+        <br><strong>Step 2 - Choose the Column that contains the text</strong><br>
+        {% if first_view %}
+          <label for="text_column">Text Column</label>
+          <select id="text_column" name="training_param" disabled onchange="text_selected()">
+            <option hidden disabled selected value> -- select an option -- </option>
+            {% for c in column_names %}
+              <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+          <br><strong>Step 3 - Choose the Model to Use</strong><br>
+          
+          <label for="model_selection">Model</label>
+          <select id="model_selection" name="model_selection" disabled onchange="model_selected()">
+            <option hidden disabled selected value> -- select an option -- </option>
+            <option value="K-MEANS">K-MEANS</option>
+            <option value="LDA">LDA</option>
+            <option value="NMF">NMF</option>
+            <option value="TF-IDF">TF-IDF</option>
+          </select>
+          <br><strong>Step 4 - Choose Text Normalisation (Optional - Not for K-Means Models)</strong><br>
+          
+          <label for="normalisation">Text Normalisation</label>
+          <select id="normalisation" name="normalisation" disabled onchange="normalisation_changed()">
+            <option hidden disabled selected value> -- select an option -- </option>
+            <option value="None">None</option>
+            <option value="Lemmatization">Lemmatization</option>
+            <option value="Stemming">Stemming</option>
+          </select>
+          <br><strong>Step 5 - Choose The Label Column for TF-IDF Models</strong><br>
+          <label for="label_column">Label Column</label>
+          <select id="label_column" name="label_column" disabled onchange="label_changed()">
+            <option hidden disabled selected value> -- select an option -- </option>
+            {% for c in column_names %}
+              <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+          <br><strong>Step 6 - Choose the Number of Topics >1 for NMF, Optional for LDA 0 will estimate the number</strong><br>
+          <label for="num_topics">Number of Topics:</label>
+          <input type="number" id="num_topics" name="num_topics" min="0" disabled><br> 
+          
+        {% endif %}
         
-        <label for="model_selection">Model</label>
-        <select id="model_selection" disabled onchange="model_selected()">
-          <option hidden disabled selected value> -- select an option -- </option>
-          <option value="K-MEANS">K-MEANS</option>
-          <option value="LDA">LDA</option>
-          <option value="NMF">NMF</option>
-          <option value="TF-IDF">TF-IDF</option>
-        </select>
-        <br><strong>Step 3 - Chose Text Normalisation (Optional - Not for K-Means Models)</strong><br>
+          <br><button type="submit" id="table_submit" name="table_submit" disabled>Train Model</button><br>
         
-        <label for="normalisation">Text Normalisation</label>
-        <select id="normalisation" disabled>
-          <option hidden disabled selected value> -- select an option -- </option>
-          <option value="None">None</option>
-          <option value="Lemmatization">Lemmatization</option>
-          <option value="Stemming">Stemming</option>
-        </select>
-        <br><strong>Step 4 - Chose The Label Column for TF-IDF Models</strong><br>
-        <label for="label_column">Label Column</label>
-        <select id="label_column" name="training_param" disabled onchange="label_changed()">
-          <option hidden disabled selected value> -- select an option -- </option>
-          {% for c in column_names %}
-            <option value="{{ c }}">{{ c }}</option>
-          {% endfor %}
-        </select>
-        <br><strong>Step 5 - Chose the Number of Topics >1 for NMF, Optional for LDA 0 will estimate the number</strong><br>
-        <label for="num_topics">Number of Topics:</label>
-        <input type="number" id="num_topics" name="num_topics" min="0" disabled><br> 
-        
-      {% endif %}
-      <br><button type="submit" id="table_submit" name="table_submit" disabled>Train Model</button><br>
-      <br><table width="100%">
+      
+      <br><table width="100%" name="table">
         
         <tr>
           {% if first_view %}
             
-            <th id="{{index_name}}"><span style="max-width:150px;"> {{index_name}}</span></th>
+            <th id="{{index_name}}" name="{{index_name}}"><span style="max-width:150px;"> {{index_name}}</span></th>
            
             {% for c in column_names %}
-              <th id="{{ c }}"><span style="max-width:150px;"> {{c}} </span></th>
+              <th id="{{ c }}" name="{{ c }}"><span style="max-width:150px;"> {{c}} </span></th>
               
             {% endfor %}
           {% endif %}
@@ -96,8 +106,10 @@ Train
           {% endfor %}          
         </tbody>
       </table>
+      
+    </form>
     {% endif %}
-  </form>
+  
 </div>
 
 <script type = "text/javascript">
@@ -105,16 +117,22 @@ function getfile_changed(){
   var btn_GetText = document.getElementById("file_upload");
   btn_GetText.disabled = false;
 }
+function getfile_model_changed(){
+  var text_column = document.getElementById("text_column")
+  text_column.disabled = false;
+}
 function text_selected(){
   var model_selection = document.getElementById("model_selection");
   model_selection.disabled = false;
 }
 function model_selected(){
+  
   var model_selection = document.getElementById("model_selection");
   var normalisation = document.getElementById("normalisation")
   var label_column = document.getElementById("label_column");
   var table_submit = document.getElementById("table_submit");
   var num_topics = document.getElementById("num_topics");
+  
   
   if (model_selection.value != "K-MEANS") {
     normalisation.disabled = false;
@@ -148,11 +166,42 @@ function model_selected(){
   if (model_selection.value == "LDA"){
     num_topics.value = "0";
     num_topics.disabled = false;
+    if (normalisation.value != "") {
+      table_submit.disabled = false;
+    }
+    else {
+      table_submit.disabled = true;
+    }
   }
   if (model_selection.value == "NMF"){
     num_topics.value = "2";
     num_topics.disabled = false;
+    if (normalisation.value != "") {
+      table_submit.disabled = false;
+    }
+    else{
+      table_submit.disabled = true;
+    }
+    
   }
+}
+function normalisation_changed(){
+  var normalisation = document.getElementById("normalisation")
+  var table_submit = document.getElementById("table_submit");
+  var model_selection = document.getElementById("model_selection");
+  var label_column = document.getElementById("label_column");
+  if (model_selection.value == "TF-IDF"){
+    if (label_column.value == "") {
+      table_submit.disabled = true;
+    }
+    else{
+      table_submit.disabled = false;
+    }
+  }
+  else {
+    table_submit.disabled = false;
+  }
+  
 }
 function label_changed(){
   var label_column = document.getElementById("label_column");
