@@ -35,7 +35,9 @@ def settings(request):
         #Get the form data
         tika_url = request.POST.get('tika_url')
         conf_settings.TIKA = tika_url
-    args = {'tika_url' : conf_settings.TIKA}
+        rest_url = request.POST.get('rest_url')
+        conf_settings.REST = rest_url
+    args = {'tika_url' : conf_settings.TIKA,'rest_url':conf_settings.REST}
     return render(request, "userexperience/settings.html",args)
 def about(request):
     return render(request, "userexperience/about.html")
