@@ -26,6 +26,7 @@ def train(request):
     #See if the post is from the model parameter screen
     if request.method == "POST" and "model_selection" in request.POST:
         args = model_train(request)
+        return render(request, 'userexperience/train.html', args[1])
     args = {'first' : True}
     return render(request, "userexperience/train.html",args)
 def settings(request):

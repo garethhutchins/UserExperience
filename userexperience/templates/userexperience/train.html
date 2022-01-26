@@ -109,7 +109,36 @@ Train
       
     </form>
     {% endif %}
-  
+    {% if model_type %}
+      <div class="results">
+        <img src="{{ topics_image }}" alt="" width="1000" height="1000">
+        {% if score %}
+          <br><strong>Score: {{ score }}</strong><br>
+          <strong>Topics: </strong>
+          {% for key, value in labels.items %}
+            <br><strong>Topic {{key}} : {{ value }}</strong>
+          {% endfor %}  
+        {% else %}
+          <table id="topic_table">
+            <tr>
+              <th id="topic_number_header">Topic Number</th>
+              <th id="topic_name_header">Topic Name</th>
+            </tr>
+            <tbody>
+              {% for key, value in labels.items %}
+              <tr>
+                <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ key }}</span></td>
+                <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ value }}</span></td>
+              </tr>
+              {% endfor %} 
+            </tbody>
+            
+          </table>
+        {% endif %}
+      </div>
+
+      
+    {% endif %}
 </div>
 
 <script type = "text/javascript">

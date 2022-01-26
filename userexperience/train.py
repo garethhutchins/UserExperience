@@ -78,16 +78,40 @@ def model_train(request):
     full_file_path = fs.location + "/" + filename
     #Guess the Mime Type
     mime = mimetypes.guess_type(full_file_path)
-    file = open(full_file_path,'rb')
+    with open(full_file_path, 'rb') as file:
     
+        files=[
+            ('file',(filename,file,mime[0]))
+        ]
+        headers = {}
 
-    files=[
-        ('file',(filename,file,mime[0]))
-    ]
-    headers = {}
-
-    response = requests.request("POST", url, headers=headers, data=req, files=files)
-    #Now delete the temporary file
+        response = requests.request("POST", url, headers=headers, data=req, files=files)
+    
     #Now delete the file
     fs.delete(filename)
-    return
+    if response.status_code == 200 :
+        #Everything is OK
+        #Load the Json response
+        res = json.loads(response.content)
+        model_type = res['model_type']
+        model_name = res['name']
+        topics_image = res['topics_image']
+        num_topics = res['num_topics']
+        if model_type == "TF-IDF":
+            labels = res['topic_labels']['labels']
+            score = res['topic_labels']['score']
+            args = {'model_type' : model_type, 'model_name': model_name, 'topics_image': topics_image,
+            'labels': labels, 'score' :score}
+        else:
+            labels = res['topic_labels']
+            
+            if len(labels) == 0:
+                labels = {}
+                for x in range(1,num_topics+1):
+                    labels[x] = ""
+            args = {'model_type' : model_type, 'model_name': model_name, 'topics_image': topics_image,
+            'labels': labels}
+        return response.status_code, args
+    else:
+        args = {'Error' : response.text}
+        return response.status_code, args
