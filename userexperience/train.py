@@ -1,8 +1,10 @@
 from django.core.files.storage import FileSystemStorage
+from django.conf import settings as conf_settings
 import mimetypes
 import pandas as pd
 import json
 import re
+import requests
 
 def load_csv(myfile):
     #Look to see what needs to be treaded as csv
@@ -45,4 +47,47 @@ def table_submit(request):
     args = {'text' : False, 'table_data' : data, 'index_name' : selected_column, 'cleaned' : True}
     return args
 def model_train(request):
+    #Get the URL from the setting
+    url = conf_settings.REST
+    url = url + "/train_topic_table/"
+    #Now get the items from the request
+    req = {}
+    column = request.POST.get('training_param')
+    req['selected_column'] = column
+    model_selection = request.POST.get('model_selection')
+    req['model_type'] = model_selection
+    #Now look to see what model has been selected to get the rest of the information
+    if model_selection == "K-MEANS":
+        num_topics = request.POST.get('num_topics')
+        req['num_topics'] = num_topics
+    if model_selection == "TF-IDF":
+        normalisation = request.POST.get('normalisation')
+        req['normalisation'] = normalisation
+        label_column = request.POST.get('label_column')
+        req['label_column'] = label_column
+    if model_selection == "NMF" or model_selection == "LDA":
+        normalisation = request.POST.get('normalisation')
+        req['normalisation'] = normalisation
+        num_topics = request.POST.get('num_topics')
+        req['num_topics'] = num_topics
+    #Now get the file
+    #Save the file so it can be read
+    fs = FileSystemStorage()
+    myfile = request._files['myfile']
+    filename = fs.save(myfile.name, myfile)
+    full_file_path = fs.location + "/" + filename
+    #Guess the Mime Type
+    mime = mimetypes.guess_type(full_file_path)
+    file = open(full_file_path,'rb')
+    
+
+    files=[
+        ('file',(filename,file,mime[0]))
+    ]
+    headers = {}
+
+    response = requests.request("POST", url, headers=headers, data=req, files=files)
+    #Now delete the temporary file
+    #Now delete the file
+    fs.delete(filename)
     return
