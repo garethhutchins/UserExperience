@@ -1,3 +1,4 @@
+from email import header
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings as conf_settings
 import mimetypes
@@ -115,3 +116,29 @@ def model_train(request):
     else:
         args = {'Error' : response.text}
         return response.status_code, args
+def update_model(request):
+    #Also need to loop through all of the topic_labels
+    ok=True
+    topic_labels = {}
+    i = 1
+    while (ok == True):
+        try:
+            lbl = request.POST['topic_label_'+str(i)]
+            topic_labels[str(i)] = lbl
+            i +=1
+        except:
+            ok=False
+    #Now get the model name
+    model_name = request.POST['model_name']
+    str_request = json.dumps(topic_labels)
+    url = conf_settings.REST
+    url = url + '/models/' + model_name + '/'
+    req = {}
+    req['topic_labels'] = str_request
+    headers = {}
+    response = requests.request("PUT", url, headers=headers, data=req)
+    #Now pass back the new image
+    res = json.loads(response.content)
+    img = res['topics_image']
+
+    return img

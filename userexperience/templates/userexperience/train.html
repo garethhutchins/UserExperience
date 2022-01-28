@@ -119,6 +119,10 @@ Train
             <br><strong>Topic {{key}} : {{ value }}</strong>
           {% endfor %}  
         {% else %}
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <strong>Update Topic Labels</strong>
+          <br><input type="text" id="model_name" name="model_name" value="{{ model_name }}">
           <table id="topic_table">
             <tr>
               <th id="topic_number_header">Topic Number</th>
@@ -128,12 +132,13 @@ Train
               {% for key, value in labels.items %}
               <tr>
                 <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ key }}</span></td>
-                <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ value }}</span></td>
+                <td><input type="text" id="topic_label_{{key}}" name="topic_label_{{key}}"></td>
               </tr>
               {% endfor %} 
             </tbody>
-            
           </table>
+          <br><button type="submit" id="topics_submit" name="topics_submit">Update Topics</button><br>
+        </form>
         {% endif %}
       </div>
 

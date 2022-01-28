@@ -1,4 +1,5 @@
 import re
+from turtle import update
 import requests
 
 import pandas as pd
@@ -10,7 +11,7 @@ from django.utils.timezone import datetime
 from django.conf import settings as conf_settings
 from django.apps import apps
 from flatten_json import flatten
-from .train import load_csv, table_submit, model_train
+from .train import load_csv, table_submit, model_train, update_model
 # Create your views here.
 def home(request):
     return render(request, "userexperience/home.html")
@@ -27,6 +28,9 @@ def train(request):
     if request.method == "POST" and "model_selection" in request.POST:
         args = model_train(request)
         return render(request, 'userexperience/train.html', args[1])
+    #Now Update the Topics
+    if request.method == "POST" and 'topic_label_1' in request.POST:
+        update_model(request)
     args = {'first' : True}
     return render(request, "userexperience/train.html",args)
 def settings(request):
