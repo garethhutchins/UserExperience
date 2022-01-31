@@ -12,9 +12,18 @@ from django.conf import settings as conf_settings
 from django.apps import apps
 from flatten_json import flatten
 from .train import load_csv, table_submit, model_train, update_model
+from .test import list_models
 # Create your views here.
 def home(request):
-    return render(request, "userexperience/home.html")
+    #If it's the first time - get the list of models to select from
+    if request.method != "POST":
+        #Get the list of Models
+        status_code, df_j, column_names = list_models()
+        if status_code == 200:
+            args = {'df_j':df_j,'column_names':column_names}
+        else:
+            args = {'message':df_j}
+    return render(request, "userexperience/home.html",args)
 
 def test(request):
     return render(request, "userexperience/test.html")

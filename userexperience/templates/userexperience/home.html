@@ -3,5 +3,56 @@
 Home
 {% endblock %}
 {% block content %}
-<p>Home page for Narrative Flow Analysis.</p>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'userexperience/test.css' %}"/>
+<strong>Home page for Narrative Flow Analysis.</strong>
+{% if df_j %}
+    <br><strong>Trained Models</strong>
+    <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for models..">
+    <br><table name="model_table" id="myTable">
+        <tr id="model_table_headers" class="header">
+            {% for c in column_names %}
+              <th id="{{ c }}" name="{{ c }}" id="{{ c }}"><span style="max-width:150px;"> {{c}} </span></th>
+            {% endfor %}
+        </tr>
+        {% for td in df_j %}
+            <tr>
+                {% for key, value in td.items %}
+                    <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ value }}</span></td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+{% endif %}
+
+<script>
+    function myFunction() {
+      // Declare variables
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("myInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("myTable");
+      tr = table.getElementsByTagName("tr");
+    
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[5];
+        mt = tr[i].getElementsByTagName("td")[1];
+        tf = tr[i].getElementsByTagName("td")[2];
+        nt = tr[i].getElementsByTagName("td")[3];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          mtValue = mt.textContent || mt.innerText;
+          ntValue = nt.textContent || nt.innerText;
+          tfValue = tf.textContent || tf.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1 || mtValue.toUpperCase().indexOf(filter) > -1 || tfValue.toUpperCase().indexOf(filter) > -1 || ntValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+    </script>
 {% endblock %}
