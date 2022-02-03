@@ -5,8 +5,20 @@ Home
 {% block content %}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'userexperience/test.css' %}"/>
-<strong>Home page for Narrative Flow Analysis.</strong>
+<h1>Home page for Narrative Flow Analysis</h1>
 {% if df_j %}
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <br><h2>Select a Model and then Choose a file to analyse the Narrative Flow</h2><br>
+      <br><strong>Step 1 - Select a Model from the Table Below</strong>
+      <br><label for="model_id">Selected Model:</label>
+      <input type="text" id="model_id" name="model_id" disabled size=40>
+      <br><strong>Step 2 - Choose a File to Process</strong>
+      <br><input type="file" name="myfile" id="myfile" disabled onchange="file_changed()">
+      <br><strong>Step 3 - Analyse the Document</strong>
+      <br><button type="submit" id="file_submit" name="file_submit" disabled>Analyse Document</button><br>
+    </form>
+    <div id="model_search">
     <br><strong>Trained Models</strong>
     <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for models..">
     <br><table name="model_table" id="myTable">
@@ -16,17 +28,45 @@ Home
             {% endfor %}
         </tr>
         {% for td in df_j %}
-            <tr>
+            <tr class="clickable">
                 {% for key, value in td.items %}
                     <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ value }}</span></td>
                 {% endfor %}
             </tr>
         {% endfor %}
     </table>
+  </div>
 {% else %}
 {% endif %}
 
 <script>
+   
+    function file_changed(){
+      var submit = document.getElementById("file_submit");
+      submit.disabled = false;
+    }
+    function addRowHandlers() {
+    var table = document.getElementById("myTable");
+    var rows = table.getElementsByTagName("tr");
+    var modelId = document.getElementById("model_id");
+    var fileSelect = document.getElementById("myfile");
+    for (i = 0; i < rows.length; i++) {
+        var currentRow = table.rows[i];
+        var createClickHandler = 
+            function(row) 
+            {
+                return function() { 
+                                        var cell = row.getElementsByTagName("td")[0];
+                                        var id = cell.innerText;
+                                        modelId.value = id;
+                                        fileSelect.disabled = false;
+                                 };
+            };
+
+        currentRow.onclick = createClickHandler(currentRow);
+    }
+}
+window.onload = addRowHandlers();
     function myFunction() {
       // Declare variables
       var input, filter, table, tr, td, i, txtValue;
@@ -54,5 +94,6 @@ Home
         }
       }
     }
+   
     </script>
 {% endblock %}

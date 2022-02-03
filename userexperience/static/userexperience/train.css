@@ -1,0 +1,11 @@
+select {
+    margin-bottom: 0px;
+    margin-top: 0px;
+    font-family: cursive, sans-serif;
+    outline: 0;
+    background: #b11f1f;
+    color: #fff;
+    border: 1px solid crimson;
+    padding: 4px;
+    border-radius: 9px;
+  }
