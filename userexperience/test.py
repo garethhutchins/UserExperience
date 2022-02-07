@@ -1,3 +1,5 @@
+from email import header
+from http.client import HTTPException
 from urllib import response
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings as conf_settings
@@ -11,7 +13,12 @@ def list_models():
     #Get the URL from the setting
     url = conf_settings.REST
     url = url + "/models/"
-    response = requests.request("GET",url)
+    try:
+        response = requests.request("GET",url)
+    except:
+        data = {}
+        return 500, data, {'Message':'Unable to Connect to REST services, check settings'}
+    
     if response.status_code != 200:
         return response.status_code, {'Message':'Unable to Connect to REST services, check settings'}
     #Get the json
@@ -59,3 +66,37 @@ def list_models():
     data = json.loads(df_j)
     column_names = df.columns.values
     return response.status_code, data, column_names
+
+def analyse_document(request):
+    #Get the file and save it
+    file_uploaded = request._files['myfile']
+    #Content Type
+    content_type = file_uploaded.content_type
+    #File Name
+    name = file_uploaded.name
+    #Save the file so it can be read
+    fs = FileSystemStorage()
+    filename = fs.save(name, file_uploaded)
+    full_file_path = fs.location + "/" + filename
+    tika = 'true'
+    tika_uri = conf_settings.TIKA
+    headers = {
+                    'Content-Type': content_type
+                    }
+    #open the file for reading
+    with open(full_file_path, 'rb') as f:
+        payload=f.read()
+    try:
+        response = requests.request('PUT',tika_uri,headers=headers, data=payload)
+    except:
+        fs.delete(filename)
+        return {'message':'Unable to to Reach TIKA Server - Check Settings'}
+    if response.status_code != 200:
+        #An Error Occured
+        fs.delete(filename)
+        return {'message':response.text}
+    text = response.text
+    fs.delete(filename)
+    #Now look at the model ID
+    model_id = request.POST['model_id']
+    normalisation = request.POST['normalisation']

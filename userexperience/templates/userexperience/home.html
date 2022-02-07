@@ -12,7 +12,8 @@ Home
       <br><h2>Select a Model and then Choose a file to analyse the Narrative Flow</h2><br>
       <br><strong>Step 1 - Select a Model from the Table Below</strong>
       <br><label for="model_id">Selected Model:</label>
-      <input type="text" id="model_id" name="model_id" disabled size=40>
+      <input type="text" id="model_id" name="model_id" readonly size=40>
+      <br><input type="text" id="normalisation" name="normalisation" readonly size=40>
       <br><strong>Step 2 - Choose a File to Process</strong>
       <br><input type="file" name="myfile" id="myfile" disabled onchange="file_changed()">
       <br><strong>Step 3 - Analyse the Document</strong>
@@ -37,6 +38,7 @@ Home
     </table>
   </div>
 {% else %}
+  <h2>Unable to Connect to REST Services - Check Settings</h2>
 {% endif %}
 
 <script>
@@ -49,6 +51,7 @@ Home
     var table = document.getElementById("myTable");
     var rows = table.getElementsByTagName("tr");
     var modelId = document.getElementById("model_id");
+    var normalisation = document.getElementById("normalisation")
     var fileSelect = document.getElementById("myfile");
     for (i = 0; i < rows.length; i++) {
         var currentRow = table.rows[i];
@@ -59,6 +62,9 @@ Home
                                         var cell = row.getElementsByTagName("td")[0];
                                         var id = cell.innerText;
                                         modelId.value = id;
+                                        var cell = row.getElementsByTagName("td")[3];
+                                        var norm = cell.innerText;
+                                        normalisation.value = norm;
                                         fileSelect.disabled = false;
                                  };
             };

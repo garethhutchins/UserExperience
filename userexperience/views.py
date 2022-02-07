@@ -12,7 +12,7 @@ from django.conf import settings as conf_settings
 from django.apps import apps
 from flatten_json import flatten
 from .train import load_csv, table_submit, model_train, update_model
-from .test import list_models
+from .test import list_models, analyse_document
 # Create your views here.
 def home(request):
     #If it's the first time - get the list of models to select from
@@ -23,7 +23,11 @@ def home(request):
             args = {'df_j':df_j,'column_names':column_names}
         else:
             args = {'message':df_j}
-    return render(request, "userexperience/home.html",args)
+        return render(request, "userexperience/home.html",args)
+    else:
+        #Now lets' upload the document
+        analyse_document(request)
+        
 
 def test(request):
     return render(request, "userexperience/test.html")
