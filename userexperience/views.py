@@ -24,11 +24,17 @@ def home(request):
         else:
             args = {'message':df_j}
         return render(request, "userexperience/home.html",args)
-    else:
-        #Now lets' upload the document
-        analyse_document(request)
-        
-
+    #Now lets' upload the document as it's a post
+    results = analyse_document(request)
+    #see if there's an error
+    if 'message' in results:
+        args = results
+        return render(request, "userexperience/home.html",args)
+    #Return the results back to the results page
+    args = analyse_document(request)
+    return render(request,"userexperience/results.html",args)    
+def results(request):
+    return render(request,"userexperience/results.html")
 def test(request):
     return render(request, "userexperience/test.html")
 def train(request):
@@ -55,7 +61,9 @@ def settings(request):
         conf_settings.TIKA = tika_url
         rest_url = request.POST.get('rest_url')
         conf_settings.REST = rest_url
-    args = {'tika_url' : conf_settings.TIKA,'rest_url':conf_settings.REST}
+        conf_settings.WINDOW_SIZE = request.POST.get('window_size')
+        conf_settings.WINDOW_SLIDE = request.POST.get('window_slide')
+    args = {'tika_url' : conf_settings.TIKA,'rest_url':conf_settings.REST,'window_size':conf_settings.WINDOW_SIZE,'window_slide':conf_settings.WINDOW_SLIDE}
     return render(request, "userexperience/settings.html",args)
 def about(request):
     return render(request, "userexperience/about.html")
