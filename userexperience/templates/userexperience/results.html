@@ -3,11 +3,54 @@
 Results
 {% endblock %}
 {% block content %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'userexperience/results.css' %}"/>
 <h1>Analysis Results</h1>
 {% csrf_token %}
 {% if model_type %}
     <p>{{ model_type }}</p>
-    <img id="picture" src="data:image/jpeg;base64,{{ plot }}">
-    <br><img src="data:image/jpeg;base64,{{ plot }}" alt="" width="1000" height="1000">
+    <div class="tab">
+        <button class="tablinks" onclick="openGraph(event, 'Line')"  id="defaultOpen">Line Plot</button>
+        <button class="tablinks" onclick="openGraph(event, 'Area')">Area Plot</button>
+    </div>
+    <!-- Tab content -->
+    <div id="Line" class="tabcontent">
+        <img id="picture" src="data:image/jpeg;base64,{{ line_plot }}">
+    </div>
+    
+    <div id="Area" class="tabcontent">
+        <img id="picture" src="data:image/jpeg;base64,{{ area_plot }}"> 
+    </div>
+    <!-- Create the Table-->
+    <div id="showtable">
+        <table name="results_table" id="myTable">
+
+        </table>
+    </div>
+    
+    <script>
+        document.getElementById("defaultOpen").click();
+    function openGraph(evt, GraphType) {
+      // Declare all variables
+      var i, tabcontent, tablinks;
+    
+      // Get all elements with class="tabcontent" and hide them
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+    
+      // Get all elements with class="tablinks" and remove the class "active"
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+    
+      // Show the current tab, and add an "active" class to the button that opened the tab
+      document.getElementById(GraphType).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+    </script>    
 {% endif %}
+
 {% endblock %}

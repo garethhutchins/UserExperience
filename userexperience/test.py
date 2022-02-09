@@ -12,6 +12,7 @@ import matplotlib
 import base64
 import uuid
 
+
 def list_models():
     #Get the URL from the setting
     url = conf_settings.REST
@@ -123,31 +124,54 @@ def analyse_document(request):
     if results['model_type'] == 'TF-IDF':
         texts = []
         top_topic = []
-        topics = []
-        scores = []
+        topic_scores = []
         #Loop through al of the results
         for r in results['process_results']:
             texts.append(r['Text'])
             top_topic.append(r['Topics'][0])
-            topics.append(r['Topics'])
-            scores.append(r['Scores'])
+            topic_scores.append(dict(zip(r['Topics'],r['Scores']*100)))
         #Create the Topic Flow Image
         #Save the results to a dataframe
         df = pd.DataFrame()
         df['Text'] = texts
-        df['Topics'] = topics
-        df['Scores'] = scores
+        df['Top Topic'] = top_topic
+        df['Topic Scores'] = topic_scores
+        column_names = list(df.columns)
+        #Save this to json
+        json_records = df.reset_index().to_json(orient='records')
+        data = []
+        data = json.loads(json_records)
+        #Now create the plot
+
         #First get the list of Topics and scores from the df
-        flow = df[['Topics','Scores']]
-        tf_topics = flow['Topics'][0]
-        df = pd.DataFrame(flow['Scores'].to_list(),columns=topics)
-        lines = df.plot.line(figsize=(15,5),title="Topic Flow")
+        dx = pd.DataFrame(topic_scores)
+        #Now do a line Plot
+        lines = dx.plot.line(figsize=(15,5),title="Topic Flow")
         lines.set_xlabel("Window Position")
         lines.set_ylabel("Topic Score")
         fig = lines.get_figure()
         fname = str(uuid.uuid4())
+        #Save the file so it can be read
         fig.savefig(fname + ".png")
-        img = base64.encode(fname+".png")
+        with open(fname + ".png", "rb") as image_file:
+            line_encoded_string = base64.b64encode(image_file.read()).decode('ascii')
+        #Delete the image
+        fs = FileSystemStorage()
+        fs.delete(fname + ".png")
+        #Now do an Area Plot
+        #Now do a line Plot
+        area = dx.plot.area(figsize=(15,5),title="Topic Flow")
+        area.set_xlabel("Window Position")
+        area.set_ylabel("Topic Score")
+        fig = area.get_figure()
+        fname = str(uuid.uuid4())
+        #Save the file so it can be read
+        fig.savefig(fname + ".png")
+        with open(fname + ".png", "rb") as image_file:
+            area_encoded_string = base64.b64encode(image_file.read()).decode('ascii')
+        #Delete the image
+        fs = FileSystemStorage()
+        fs.delete(fname + ".png")
         #Now return these results
-        return {'model_type':results['model_type'],'text':texts,'top_topic':top_topic,'topics':topics,'scores':scores,'plot':img}
+        return {'model_type':results['model_type'],'table_data':data,'column_names':column_names,'line_plot':line_encoded_string,'area_plot':area_encoded_string}
     
