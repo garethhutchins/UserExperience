@@ -42,7 +42,7 @@ def list_models():
         training_file.append(j['file_name'])
         #try for score
         try:
-            score.append(j['topic_labels']['score'])
+            score.append("{:.2%}".format(j['topic_labels']['score']))
             #Now add TF-IDF labels
             topic_labels = []
             for key, value in j['topic_labels']['labels'].items():
@@ -125,6 +125,7 @@ def analyse_document(request):
         texts = []
         top_topic = []
         topic_scores = []
+        num_topics = len(results['process_results'][0]['Topics'])
         #Loop through al of the results
         for r in results['process_results']:
             texts.append(r['Text'])
@@ -136,7 +137,7 @@ def analyse_document(request):
         df['Text'] = texts
         df['Top Topic'] = top_topic
         df['Topic Scores'] = topic_scores
-        column_names = list(df.columns)
+        column_names = list(df.columns.insert(0,'Window Position'))
         #Save this to json
         json_records = df.reset_index().to_json(orient='records')
         data = []
@@ -146,9 +147,13 @@ def analyse_document(request):
         #First get the list of Topics and scores from the df
         dx = pd.DataFrame(topic_scores)
         #Now do a line Plot
-        lines = dx.plot.line(figsize=(15,5),title="Topic Flow")
+        if num_topics > 10:
+            lines = dx.plot.line(figsize=(30,10),title="Topic Flow")
+        else:
+            lines = dx.plot.line(figsize=(15,5),title="Topic Flow")
         lines.set_xlabel("Window Position")
         lines.set_ylabel("Topic Score")
+        lines.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
         fig = lines.get_figure()
         fname = str(uuid.uuid4())
         #Save the file so it can be read
@@ -160,7 +165,10 @@ def analyse_document(request):
         fs.delete(fname + ".png")
         #Now do an Area Plot
         #Now do a line Plot
-        area = dx.plot.area(figsize=(15,5),title="Topic Flow")
+        if num_topics > 10:
+            area = dx.plot.area(figsize=(30,10),title="Topic Flow")
+        else:
+            area = dx.plot.area(figsize=(15,5),title="Topic Flow")
         area.set_xlabel("Window Position")
         area.set_ylabel("Topic Score")
         fig = area.get_figure()

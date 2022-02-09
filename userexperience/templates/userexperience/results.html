@@ -15,16 +15,52 @@ Results
     </div>
     <!-- Tab content -->
     <div id="Line" class="tabcontent">
-        <img id="picture" src="data:image/jpeg;base64,{{ line_plot }}">
+      <div class="imgbox">
+        <img id="picture" class="center-fit" src="data:image/jpeg;base64,{{ line_plot }}">
+      </div>
+        
     </div>
     
     <div id="Area" class="tabcontent">
-        <img id="picture" src="data:image/jpeg;base64,{{ area_plot }}"> 
+      <div class="imgbox">
+        <img id="picture" class="center-fit" src="data:image/jpeg;base64,{{ area_plot }}"> 
+      </div>
+        
     </div>
     <!-- Create the Table-->
     <div id="showtable">
         <table name="results_table" id="myTable">
-
+          <tr id="model_table_headers" class="header">
+            {% for c in column_names %}
+              <th id="{{ c }}" name="{{ c }}" id="{{ c }}"><span style="max-width:50px;"> {{c}} </span></th>
+            {% endfor %}
+          </tr>
+          {% for td in table_data %}
+          <tr>
+            {% for key, value in td.items %}
+              {% if key != "Topic Scores" %}
+                <td><span style="max-width:50px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ value }}</span></td>
+              {% else %}
+                <td>
+                  <table name="scores_table" id="myTable">
+                    <tr id="scores_table_headers" class="header">
+                      <th id="topic">Topic</th>
+                      <th id="score">Score</th>
+                    </tr>
+                    {% for k, v in value.items %}
+                    <tr>
+                      
+                      <td name="{{k}}_[{{forloop.parentloop.counter}}]_0">{{ k }}</td>  
+                      <td name="{{k}}_[{{forloop.parentloop.counter}}]_1">{{ v }}</td>
+                      
+                    </tr>
+                    {% endfor %}
+                  </table>
+                </td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
         </table>
     </div>
     
