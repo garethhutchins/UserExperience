@@ -83,9 +83,9 @@ Train
           <br><button type="submit" id="table_submit" name="table_submit" disabled>Train Model</button><br>
         
       
-      <br><table width="100%" name="table">
+      <br><table width="100%" name="table" id="myTable">
         
-        <tr style="background-color:crimson;color: white;">
+        <tr>
           {% if first_view %}
             
             <th id="{{index_name}}" name="{{index_name}}"><span style="max-width:150px;"> {{index_name}}</span></th>
@@ -127,7 +127,7 @@ Train
           {% csrf_token %}
           <strong>Update Topic Labels</strong>
           <br><input type="text" id="model_name" name="model_name" value="{{ model_name }}">
-          <table id="topic_table">
+          <table id="myTable">
             <tr>
               <th id="topic_number_header">Topic Number</th>
               <th id="topic_name_header">Topic Name</th>
@@ -179,11 +179,17 @@ function model_selected(){
     }
   }
   else {
-    num_topics.disabled = true;
+    num_topics.disabled = false;
     num_topics.value = "";
     normalisation.disabled = true;
     normalisation.value = "";
-    table_submit.disabled = false;
+    if (num_topics == ""){
+      table_submit.disabled = true;
+    }
+    else {
+      table_submit.disabled = false;
+    }
+    
   }
   if (model_selection.value == "TF-IDF"){
     label_column.disabled = false;

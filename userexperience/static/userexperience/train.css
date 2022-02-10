@@ -3,9 +3,34 @@ select {
     margin-top: 0px;
     font-family: cursive, sans-serif;
     outline: 0;
-    background: #b11f1f;
+    background: #828581;
     color: #fff;
-    border: 1px solid crimson;
+    border: 1px solid rgb(141, 137, 138);
     padding: 4px;
     border-radius: 9px;
   }
+  #myTable {
+    border-collapse: collapse; /* Collapse borders */
+    width: 100%; /* Full-width */
+    border: 1px solid #ddd; /* Add a grey border */
+    font-size: 18px; /* Increase font-size */
+  }
+  
+  #myTable th, #myTable td {
+    text-align: left; /* Left-align text */
+    padding: 12px; /* Add padding */
+  }
+  
+  #myTable tr {
+    /* Add a bottom border to all table rows */
+    border-bottom: 1px solid #ddd;
+  }
+  
+  #myTable tr.header, #myTable tr:hover {
+    /* Add a grey background color to the table header and on hover */
+    background-color: #f1f1f1;
+  }
+  * {
+    margin: 0;
+    padding: 0;
+}

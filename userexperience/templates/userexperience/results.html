@@ -7,7 +7,7 @@ Results
 <link rel="stylesheet" type="text/css" href="{% static 'userexperience/results.css' %}"/>
 <h1>Analysis Results</h1>
 {% csrf_token %}
-{% if model_type %}
+{% if score_model == True %}
     <p>{{ model_type }}</p>
     <div class="tab">
         <button class="tablinks" onclick="openGraph(event, 'Line')"  id="defaultOpen">Line Plot</button>

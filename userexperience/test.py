@@ -1,5 +1,6 @@
 from email import header
 from http.client import HTTPException
+from unittest import result
 from urllib import response
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings as conf_settings
@@ -121,7 +122,7 @@ def analyse_document(request):
     results = json.loads(response.text)
     #Now check the model type to tailor the results
     
-    if results['model_type'] == 'TF-IDF':
+    if results['model_type'] == 'TF-IDF' or results['model_type'] == 'NMF' or results['model_type'] == 'LDA':
         texts = []
         top_topic = []
         topic_scores = []
@@ -181,5 +182,16 @@ def analyse_document(request):
         fs = FileSystemStorage()
         fs.delete(fname + ".png")
         #Now return these results
-        return {'model_type':results['model_type'],'table_data':data,'column_names':column_names,'line_plot':line_encoded_string,'area_plot':area_encoded_string}
-    
+        return {'score_model':True,'model_type':results['model_type'],'table_data':data,'column_names':column_names,'line_plot':line_encoded_string,'area_plot':area_encoded_string}
+    #NMF Model
+    if result['model_type'] == 'NMF':
+        texts = []
+        top_topic = []
+        topic_scores = []
+        num_topics = len(results['process_results'][0]['Topics'])
+        #Loop through al of the results
+        for r in results['process_results']:
+            texts.append(r['Text'])
+            top_topic.append(r['Topics'][0])
+            topic_scores.append(dict(zip(r['Topics'],r['Scores']*10)))
+
