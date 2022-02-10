@@ -5,7 +5,7 @@ Train
 {% block content %}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'userexperience/train.css' %}"/>
-<h1>Training page for Narrative Flow Analysis</h1>
+<h1>Training Page for Narrative Flow Analysis</h1>
 </br>
 {% if first %}
   <strong>Select CSV File for Training</strong>
@@ -136,7 +136,7 @@ Train
               {% for key, value in labels.items %}
               <tr>
                 <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ key }}</span></td>
-                <td><input type="text" id="topic_label_{{key}}" name="topic_label_{{key}}"></td>
+                <td><input type="text" id="myInput" name="topic_label_{{key}}"></td>
               </tr>
               {% endfor %} 
             </tbody>
@@ -147,6 +147,9 @@ Train
       </div>
 
       
+    {% endif %}
+    {% if updated_image %}
+      <img src="{{ updated_image }}" alt="" width="1000" height="1000">
     {% endif %}
 </div>
 
@@ -180,10 +183,10 @@ function model_selected(){
   }
   else {
     num_topics.disabled = false;
-    num_topics.value = "";
+    num_topics.value = 5;
     normalisation.disabled = true;
     normalisation.value = "";
-    if (num_topics == ""){
+    if (num_topics == ''){
       table_submit.disabled = true;
     }
     else {
@@ -218,7 +221,7 @@ function model_selected(){
     }
   }
   if (model_selection.value == "NMF"){
-    num_topics.value = "2";
+    num_topics.value = "5";
     num_topics.disabled = false;
     if (normalisation.value != "") {
       table_submit.disabled = false;

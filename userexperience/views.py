@@ -49,7 +49,9 @@ def train(request):
         return render(request, 'userexperience/train.html', args[1])
     #Now Update the Topics
     if request.method == "POST" and 'topic_label_1' in request.POST:
-        update_model(request)
+        img = update_model(request)
+        args = {'updated_image':img}
+        return render(request, "userexperience/train.html",args)
     args = {'first' : True}
     return render(request, "userexperience/train.html",args)
 def settings(request):
