@@ -11,6 +11,8 @@ from django.utils.timezone import datetime
 from django.conf import settings as conf_settings
 from django.apps import apps
 from flatten_json import flatten
+
+from userexperience.manage import manage_model
 from .train import load_csv, table_submit, model_train, update_model
 from .test import list_models, analyse_document
 # Create your views here.
@@ -69,8 +71,29 @@ def settings(request):
     return render(request, "userexperience/settings.html",args)
 def about(request):
     return render(request, "userexperience/about.html")
-def contact(request):
-    return render(request,"userexperience/contact.html")
+def manage(request):
+    if request.method != "POST":
+        #Get the list of Models
+        status_code, df_j, column_names = list_models()
+        if status_code == 200:
+            args = {'df_j':df_j,'column_names':column_names}
+        else:
+            args = {'message':df_j}
+        return render(request, "userexperience/manage.html",args)
+    else:
+        #Now manage the model
+        args = manage_model(request)
+        return render(request, "userexperience/model.html",args)
+def model(request):
+    if request.method == "POST":
+        if 'topics_submit' in request.POST:
+            #The topics are being updates
+            img = update_model(request)
+            args = {'updated_image':img}
+            return render(request, "userexperience/train.html",args)
+        if 'delete_model' in request.POST:
+            #The model needs to be delted
+            a=0
 
 print('starting web app')
 print('http://127.0.0.1:8000/userexperience/VSCode')

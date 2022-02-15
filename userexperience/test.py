@@ -183,15 +183,25 @@ def analyse_document(request):
         fs.delete(fname + ".png")
         #Now return these results
         return {'score_model':True,'model_type':results['model_type'],'table_data':data,'column_names':column_names,'line_plot':line_encoded_string,'area_plot':area_encoded_string}
-    #NMF Model
-    if result['model_type'] == 'NMF':
+    #k-means
+    else:
         texts = []
-        top_topic = []
-        topic_scores = []
-        num_topics = len(results['process_results'][0]['Topics'])
+        topics = []
         #Loop through al of the results
         for r in results['process_results']:
             texts.append(r['Text'])
-            top_topic.append(r['Topics'][0])
-            topic_scores.append(dict(zip(r['Topics'],r['Scores']*10)))
+            topics.append(r['Topics'])
+        df = pd.DataFrame()
+        df['Text'] = texts
+        df['Topics'] = topics
+        column_names = df.columns
+        #Add Window Position
+        column_names = list(df.columns.insert(0,'Window Position'))
+        #Save this to json
+        json_records = df.reset_index().to_json(orient='records')
+        data = []
+        data = json.loads(json_records)
+        return {'score_model':False,'model_type':results['model_type'],'table_data':data,'column_names':column_names}
+
+
 

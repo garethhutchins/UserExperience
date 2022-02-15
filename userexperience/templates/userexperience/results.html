@@ -86,7 +86,25 @@ Results
       document.getElementById(GraphType).style.display = "block";
       evt.currentTarget.className += " active";
     }
-    </script>    
+    </script>
+{% else %}    
+    <!-- Create the Table-->
+    <div id="showtable">
+      <table name="results_table" id="myTable">
+        <tr id="model_table_headers" class="header">
+          {% for c in column_names %}
+            <th id="{{ c }}" name="{{ c }}" id="{{ c }}"><span style="max-width:50px;"> {{c}} </span></th>
+          {% endfor %}
+        </tr>
+        {% for td in table_data %}
+        <tr>
+          {% for key, value in td.items %}
+            <td><span style="max-width:50px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ value }}</span></td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </table>
+  </div>
 {% endif %}
 
 {% endblock %}

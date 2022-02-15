@@ -5,18 +5,15 @@ Home
 {% block content %}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'userexperience/test.css' %}"/>
-<h1>Home page for Narrative Flow Analysis</h1>
+<h1>Manage Trained Models</h1>
 {% if df_j %}
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      <br><h2>Select a Model and then Choose a file to analyse the Narrative Flow</h2><br>
+      <br><h2>Select a Model to Manage</h2><br>
       <br><strong>Step 1 - Select a Model from the Table Below</strong>
       <br><label for="model_id">Selected Model:</label>
       <input type="text" id="model_id" name="model_id" readonly size=40>
-      <br><strong>Step 2 - Choose a File to Process</strong>
-      <br><input type="file" name="myfile" id="myfile" disabled onchange="file_changed()">
-      <br><strong>Step 3 - Analyse the Document</strong>
-      <br><button type="submit" id="file_submit" name="file_submit" disabled>Analyse Document</button><br>
+      <br><button type="submit" id="manage_model" name="manage_model" disabled>Manage Model</button><br>
     </form>
     <div id="model_search">
     <br><strong>Trained Models</strong>
@@ -54,16 +51,12 @@ Home
 
 <script>
    
-    function file_changed(){
-      var submit = document.getElementById("file_submit");
-      submit.disabled = false;
-    }
+   
     function addRowHandlers() {
     var table = document.getElementById("myTable");
     var rows = table.getElementsByTagName("tr");
     var modelId = document.getElementById("model_id");
-    var normalisation = document.getElementById("normalisation")
-    var fileSelect = document.getElementById("myfile");
+    var fileSelect = document.getElementById("manage_model");
     for (i = 0; i < rows.length; i++) {
         var currentRow = table.rows[i];
         var createClickHandler = 
