@@ -19,8 +19,11 @@ def manage_model(request):
         model_id = request.POST['model_name']
     url = url + model_id
     #see if it's a get or a delete
-    if 'delete' in request.POST:
-        a = 0
+    if 'delete_model' in request.POST:
+        #Delete the Model
+        response = requests.delete(url)
+        response = {'message':'Model Deleted'}
+        return response
     else:
         #Get the model Information
         response = requests.request("GET",url)

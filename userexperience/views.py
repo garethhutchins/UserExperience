@@ -84,16 +84,7 @@ def manage(request):
         #Now manage the model
         args = manage_model(request)
         return render(request, "userexperience/model.html",args)
-def model(request):
-    if request.method == "POST":
-        if 'topics_submit' in request.POST:
-            #The topics are being updates
-            img = update_model(request)
-            args = {'updated_image':img}
-            return render(request, "userexperience/train.html",args)
-        if 'delete_model' in request.POST:
-            #The model needs to be delted
-            a=0
+
 
 print('starting web app')
 print('http://127.0.0.1:8000/userexperience/VSCode')

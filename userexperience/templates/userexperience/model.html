@@ -12,40 +12,42 @@ Train
 <div id="showtable">
   
     {% csrf_token %}
-    
-    
-    <div class="results">
-    <img src="{{ topics_image }}" alt="" width="750" height="750">
-    <br><strong>Model Name: </strong><p>{{ name }}</p>
-    <br><strong>File Name: </strong><p>{{ file_name }}</p>
-    <br><strong>Model Type: </strong><p>{{ model_type }}</p>
-    <br><strong>Number of Topics: </strong><p>{{ num_topics }}</p>
-    <br><strong>Normalisation: </strong><p>{{ normalisation }}</p><br>
-    {% if score %}
-        <br><strong>Score: {{ score }}</strong><br><br> 
-    {% endif %}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <table id="myTable">
-        <tr>
-            <th id="topic_number_header">Topic Number</th>
-            <th id="topic_name_header">Topic Name</th>
-        </tr>
-        <tbody>
-            {% for key, value in topic_labels.items %}
+    {% if message %}
+    <br><strong>{{ message }} </strong>
+    {% else %}
+        <div class="results">
+        <img src="{{ topics_image }}" alt="" width="750" height="750">
+        <br><strong>Model Name: </strong><p>{{ name }}</p>
+        <br><strong>File Name: </strong><p>{{ file_name }}</p>
+        <br><strong>Model Type: </strong><p>{{ model_type }}</p>
+        <br><strong>Number of Topics: </strong><p>{{ num_topics }}</p>
+        <br><strong>Normalisation: </strong><p>{{ normalisation }}</p><br>
+        {% if score %}
+            <br><strong>Score: {{ score }}</strong><br><br> 
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <table id="myTable">
             <tr>
-            <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ key }}</span></td>
-            <td><input type="text" id="myInput" name="topic_label_{{key}}" value="{{ value }}"></td>
+                <th id="topic_number_header">Topic Number</th>
+                <th id="topic_name_header">Topic Name</th>
             </tr>
-            {% endfor %} 
-        </tbody>
-        </table>
-        <br><label for="model_name">Model ID:</label>
-        <br><input type="text" id="model_name" name="model_name" value="{{ name }}" readonly size="40">
-        <br><button type="submit" id="topics_submit" name="topics_submit">Update Topics</button>
-        <button type="submit" id="delete_model" name="delete_model">Delete Model</button><br>
-    </form>
-    </div>
+            <tbody>
+                {% for key, value in topic_labels.items %}
+                <tr>
+                <td><span style="max-width:150px;"name="{{key}}_[{{forloop.parentloop.counter}}]">{{ key }}</span></td>
+                <td><input type="text" id="myInput" name="topic_label_{{key}}" value="{{ value }}"></td>
+                </tr>
+                {% endfor %} 
+            </tbody>
+            </table>
+            <br><label for="model_name">Model ID:</label>
+            <br><input type="text" id="model_name" name="model_name" value="{{ name }}" readonly size="40">
+            <br><button type="submit" id="topics_submit" name="topics_submit">Update Topics</button>
+            <button type="submit" id="delete_model" name="delete_model">Delete Model</button><br>
+        </form>
+        </div>
+    {% endif %}
 
       
     
