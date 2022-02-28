@@ -1,0 +1,22 @@
+docker network create my-net
+
+docker create --name persistent_storage \
+  --network my-net \
+  --publish 8001:8001 \
+  persistent_storage_web_run
+
+docker create --name persistent_storage \
+  --network my-net \
+  --publish 8001:8001 \
+  persistent_storage_web_run
+
+docker network connect my-net narrativeflowrestservices-web_run-1
+
+http://persistent_storage-web_run-1:8001
+http://persistent-storage:8001
+docker-compose up -d
+
+docker rename persistent_storage-web_run-1 persistent-storage
+docker rename narrativeflowrestservices-web_run-1 rest-services
+
+py -3.9 -m venv .venv

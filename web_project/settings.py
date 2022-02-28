@@ -26,7 +26,11 @@ SECRET_KEY = '$v_k&312mor5ul#9+(h5_*zgig84u*%4%eaqw*u)lhb9k-@6#)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+# monkey patch to get rid of message below in docker
+from django.http.request import HttpRequest
+HttpRequest.get_host = HttpRequest._get_raw_host
 #Disable the maximum number of fields for the tables
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 # Application definition
@@ -123,7 +127,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')
 
 #Custom Application Settings
-TIKA = "http://localhost:9998/tika"
-REST = "http://127.0.0.1:8000"
+TIKA = "http://tika:9998/tika"
+REST = "http://rest-services:8000"
 WINDOW_SIZE = 255
 WINDOW_SLIDE = 125

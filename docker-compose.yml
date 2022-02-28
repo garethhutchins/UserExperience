@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+  web:
+    build: .
+    environment:
+      MYENV: EXAMPLE
+    volumes:
+      - .:/code
+  web_migrate:
+    extends:
+      service: web
+    command: python manage.py migrate
+  web_run:
+    extends:
+      service: web
+    command: python manage.py runserver 0.0.0.0:8002
+    ports:
+      - "8002:8002"
+    hostname: user-experience
+    
+  
+
+  

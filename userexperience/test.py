@@ -126,7 +126,11 @@ def analyse_document(request):
         texts = []
         top_topic = []
         topic_scores = []
-        num_topics = len(results['process_results'][0]['Topics'])
+        try:
+            num_topics = len(results['process_results'][0]['Topics'])
+        except:
+            num_topics = 0
+            return {'message':'No Topics Detected'}
         #Loop through al of the results
         for r in results['process_results']:
             texts.append(r['Text'])
