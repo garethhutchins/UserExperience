@@ -129,5 +129,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')
 #Custom Application Settings
 TIKA = "http://tika:9998/tika"
 REST = "http://rest-services:8000"
+#REST = "http://localhost:8000"
 WINDOW_SIZE = 255
 WINDOW_SLIDE = 125
