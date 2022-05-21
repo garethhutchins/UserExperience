@@ -84,7 +84,8 @@ def manage(request):
         #Now manage the model
         args = manage_model(request)
         #We need to add a time stamp to the end of the image to prevent caching
-        args['topics_image'] = args['topics_image'] + '?no_cache=' + str(time.time())
+        if 'topics_image' in args:
+            args['topics_image'] = args['topics_image'] + '?no_cache=' + str(time.time())
         return render(request, "userexperience/model.html",args)
 
 

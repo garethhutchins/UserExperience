@@ -13,11 +13,11 @@ services:
   web_run:
     extends:
       service: web
-    command: python manage.py runserver 0.0.0.0:8002
     ports:
       - "8002:8002"
     image: garethhutchins/nf_user_experience
     hostname: user-experience
+    command: python manage.py runserver 0.0.0.0:8002
     
   
 
