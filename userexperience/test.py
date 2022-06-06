@@ -12,6 +12,8 @@ import requests
 import matplotlib
 import base64
 import uuid
+#pip install kaleido==0.1.0.post1 for Windows
+#pip install kaleido for docker
 import kaleido
 import plotly.express as px
 import plotly.io as pio
