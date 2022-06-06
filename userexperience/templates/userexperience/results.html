@@ -13,6 +13,7 @@ Results
     <div class="tab">
         <button class="tablinks" onclick="openGraph(event, 'Line')"  id="defaultOpen">Line Plot</button>
         <button class="tablinks" onclick="openGraph(event, 'Area')">Area Plot</button>
+        <button class="tablinks" onclick="openGraph(event, 'Radar')">Radar Plot</button>
     </div>
     <!-- Tab content -->
     <div id="Line" class="tabcontent">
@@ -25,6 +26,12 @@ Results
     <div id="Area" class="tabcontent">
       <div class="imgbox">
         <img id="picture" class="center-fit" src="data:image/jpeg;base64,{{ area_plot }}"> 
+      </div>
+        
+    </div>
+    <div id="Radar" class="tabcontent">
+      <div class="imgbox">
+        <img id="picture" class="center-fit" src="data:image/jpeg;base64,{{ radar_plot }}"> 
       </div>
         
     </div>

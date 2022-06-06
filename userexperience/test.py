@@ -12,6 +12,10 @@ import requests
 import matplotlib
 import base64
 import uuid
+import kaleido
+import plotly.express as px
+import plotly.io as pio
+
 
 
 def list_models():
@@ -185,8 +189,21 @@ def analyse_document(request):
         #Delete the image
         fs = FileSystemStorage()
         fs.delete(fname + ".png")
+        #Now create a radar plot
+        rp = pd.DataFrame(dx.sum(),columns=['Score'])
+        fig = px.line_polar(rp, r='Score', theta=rp.index, line_close=True)
+        fig.update_traces(fill='toself')
+        fname = str(uuid.uuid4())
+        #Save the file so it can be read
+        pio.kaleido.scope.mathjax = None
+        fig.write_image(fname + ".png")
+        with open(fname + ".png", "rb") as image_file:
+            radar_encoded_string = base64.b64encode(image_file.read()).decode('ascii')
+        #Delete the image
+        fs = FileSystemStorage()
+        fs.delete(fname + ".png")
         #Now return these results
-        return {'score_model':True,'model_type':results['model_type'],'table_data':data,'column_names':column_names,'line_plot':line_encoded_string,'area_plot':area_encoded_string,'window_size':conf_settings.WINDOW_SIZE}
+        return {'score_model':True,'model_type':results['model_type'],'table_data':data,'column_names':column_names,'line_plot':line_encoded_string,'area_plot':area_encoded_string,'radar_plot':radar_encoded_string,'window_size':conf_settings.WINDOW_SIZE}
     #k-means
     else:
         texts = []
