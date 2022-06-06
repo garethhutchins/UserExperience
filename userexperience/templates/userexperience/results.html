@@ -9,6 +9,7 @@ Results
 {% csrf_token %}
 {% if score_model == True %}
     <p>{{ model_type }}</p>
+    <p>Window Size: {{ window_size }}</p>
     <div class="tab">
         <button class="tablinks" onclick="openGraph(event, 'Line')"  id="defaultOpen">Line Plot</button>
         <button class="tablinks" onclick="openGraph(event, 'Area')">Area Plot</button>

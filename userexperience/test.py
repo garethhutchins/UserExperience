@@ -186,7 +186,7 @@ def analyse_document(request):
         fs = FileSystemStorage()
         fs.delete(fname + ".png")
         #Now return these results
-        return {'score_model':True,'model_type':results['model_type'],'table_data':data,'column_names':column_names,'line_plot':line_encoded_string,'area_plot':area_encoded_string}
+        return {'score_model':True,'model_type':results['model_type'],'table_data':data,'column_names':column_names,'line_plot':line_encoded_string,'area_plot':area_encoded_string,'window_size':conf_settings.WINDOW_SIZE}
     #k-means
     else:
         texts = []
@@ -205,7 +205,7 @@ def analyse_document(request):
         json_records = df.reset_index().to_json(orient='records')
         data = []
         data = json.loads(json_records)
-        return {'score_model':False,'model_type':results['model_type'],'table_data':data,'column_names':column_names}
+        return {'score_model':False,'model_type':results['model_type'],'table_data':data,'column_names':column_names,'window_size':conf_settings.WINDOW_SIZE}
 
 
 
